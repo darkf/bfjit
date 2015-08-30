@@ -1,0 +1,1 @@
+A simple x86 JIT for Brainfuck using [asmjit](https://github.com/kobalicek/asmjit). Licensed under the terms of the MIT license (see LICENSE.txt for details).
