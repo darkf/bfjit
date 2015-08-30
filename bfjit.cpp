@@ -1,19 +1,25 @@
 #include <cstdio>
-#include <asmjit/asmjit.h>
 #include <vector>
 #include <stack>
+#include <fstream>
+#include <asmjit/asmjit.h>
 using namespace asmjit;
 using namespace asmjit::x86;
 
 int main(int argc, char *argv[]) {
-	std::vector<char> cells(1024); // construct 256 cells
+	std::ifstream fs;
+	std::vector<char> cells(1024); // construct 1024 cells
 	std::stack<std::pair<Label, Label>> block_labels;
 	JitRuntime runtime;
 	X86Compiler c(&runtime);
-
 	cells.assign(1024, 0);
 
-	const char code[] = "+++[->,.<]"; //"++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.";
+	if(argc < 2) {
+		printf("USAGE: %s FILE", argv[0]);
+		return 1;
+	}
+
+	fs.open(argv[1]);
 
 	c.addFunc(kFuncConvHost, FuncBuilder1<void, char*>());
 
@@ -28,10 +34,8 @@ int main(int argc, char *argv[]) {
 	X86GpVar _getchar(c, kVarTypeIntPtr, "_getchar");
 	c.mov(_getchar, intptr_t(&getchar));
 
-	//Label lbl(c);
-	//Label lbl2(c);
-
-	for(char ch : code) {
+	char ch;
+	while(fs >> ch) {
 		switch(ch) {
 			case '+':
 				c.inc(byte_ptr(cells_ptr));
