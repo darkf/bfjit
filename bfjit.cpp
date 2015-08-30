@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
 	cells.assign(1024, 0);
 
-	const char code[] = "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.";
+	const char code[] = "+++[->,.<]"; //"++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.";
 
 	c.addFunc(kFuncConvHost, FuncBuilder1<void, char*>());
 
@@ -24,6 +24,9 @@ int main(int argc, char *argv[]) {
 
 	X86GpVar _putchar(c, kVarTypeIntPtr, "_putchar");
 	c.mov(_putchar, intptr_t(&putchar));
+
+	X86GpVar _getchar(c, kVarTypeIntPtr, "_getchar");
+	c.mov(_getchar, intptr_t(&getchar));
 
 	//Label lbl(c);
 	//Label lbl2(c);
@@ -46,6 +49,12 @@ int main(int argc, char *argv[]) {
 				c.mov(b, byte_ptr(cells_ptr));
 				X86CallNode *call = c.call(_putchar, kX86FuncConvCDecl, FuncBuilder1<int, int>());
 				call->setArg(0, b);
+				break;
+			}
+			case ',': {
+				X86CallNode *call = c.call(_getchar, kX86FuncConvCDecl, FuncBuilder0<int>());
+				call->setRet(0, b);
+				c.mov(byte_ptr(cells_ptr), b);
 				break;
 			}
 			case '[': {
